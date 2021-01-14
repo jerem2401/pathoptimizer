@@ -1,0 +1,37 @@
+#############################
+# specifications for the PCV path
+#############################
+discard=0.1
+test=True
+string="path.pdb"
+maxrounds=30
+storedir="store"
+workdir="mywork"
+samplefreq=50
+dumpfreq=500
+evolstep=0.00125
+optends=True
+pathtype="PCV"
+lambdaval=
+springconstant_s=1000.
+springconstant_z=2000.
+# plumedoptions are placed before all
+#plumedoptions="""
+#3tor1: TORSION ATOMS=5,7,9,15
+#tor2: TORSION ATOMS=7,9,15,17
+#printtor: PRINT ARG=tor1,tor2 STRIDE=100 FILE=colvartorsion 
+#"""
+#restart=True
+#############################
+## input file
+#############################
+program="GROMACS"
+template="md.mdp"
+topology="topol.top"
+steps=5000
+plumed_append_library_path="/Users/davidebranduardi/Programs/plumed2/src/lib/"
+programpath="mdrun_mpi_d"
+preprocessor="grompp_mpi_d"
+trjconv="trjconv_mpi_d"
+gmxdir="/Users/davidebranduardi/Programs/plumed2/codes/gromacs/gromacs-4.6.5_shared_llvm/build_llvm/install"
+preprogram="export DYLD_LIBRARY_PATH=\"/Users/davidebranduardi/Programs/plumed2/src/lib/:$DYLD_LIBRARY_PATH\" ; "
