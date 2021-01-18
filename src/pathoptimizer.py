@@ -479,19 +479,19 @@ class StringClass(object):
         if os.path.exists(self.storedir)==False :
         	print("the workdir does not yet exist: looks like it is not a restart")
         	sys.exit()
-        def loadStringIntoWorkdirs(self):
-            """ Loads the frames in each workdir according soma/pcv optimization """
-            os.chdir(self.workdir)
-            for i in range (0,len(self.imagelist)):
-            	# if soma: put the all images
-            	if self.pathtype=="PCV": # in pcvs all images are loaded
-            		self.imagelist[i].filename=os.path.join(self.workdir,self.imagelist[i].dirname,"iter_"+str(self.round)+".dat")
-            		self.dumpImages(self.imagelist[i].filename,range(0,len(self.imagelist)))
-            		self.dumpPCVinput(self.workdir,self.imagelist[i].dirname,self.imagelist[i].filename,i+1)	
-            	elif self.pathtype=="SOMA": # soma must be splitted per image
-            		self.imagelist[i].filename=os.path.join(self.workdir,self.imagelist[i].dirname,"iter_"+str(self.round)+"_"+str(i+1)+".dat")
-            		self.dumpImages(self.imagelist[i].filename,[i])
-            		self.dumpSOMAinput(self.workdir,self.imagelist[i].dirname,self.imagelist[i].filename)
+    def loadStringIntoWorkdirs(self):
+        """ Loads the frames in each workdir according soma/pcv optimization """
+        os.chdir(self.workdir)
+        for i in range (0,len(self.imagelist)):
+        	# if soma: put the all images
+        	if self.pathtype=="PCV": # in pcvs all images are loaded
+        		self.imagelist[i].filename=os.path.join(self.workdir,self.imagelist[i].dirname,"iter_"+str(self.round)+".dat")
+        		self.dumpImages(self.imagelist[i].filename,range(0,len(self.imagelist)))
+        		self.dumpPCVinput(self.workdir,self.imagelist[i].dirname,self.imagelist[i].filename,i+1)	
+        	elif self.pathtype=="SOMA": # soma must be splitted per image
+        		self.imagelist[i].filename=os.path.join(self.workdir,self.imagelist[i].dirname,"iter_"+str(self.round)+"_"+str(i+1)+".dat")
+        		self.dumpImages(self.imagelist[i].filename,[i])
+        		self.dumpSOMAinput(self.workdir,self.imagelist[i].dirname,self.imagelist[i].filename)
 
     def dumpImages(self,filename,mylist):
     	"""Dump a pdb on the filename with all the images on the list""" 
@@ -597,7 +597,7 @@ PRINT ARG=(avg_meanforces\..+) STRIDE={dumpfreq} FILE=average_meanforces FMT=%12
         }
         try:
             self.plumedoptions
-        except NameError:
+        except AttributeError:
         	pass
         else:
         	f.write(self.plumedoptions)
@@ -856,17 +856,20 @@ class MDParserClass(object):
         # programs must have path that refers to the
         if os.path.isfile(os.path.join(os.environ.get("GMXBIN"),self.preprocessor))==False:
             print("  File ",os.path.join(os.environ.get("GMXBIN"),self.preprocessor)," is not there ")
-            sys.exit(2)
+            print("will try to ignore this")
+            #sys.exit(2)
         if os.path.isfile(os.path.join(os.environ.get("GMXBIN"),self.trjconv))==False:
-        	print("  File ",os.path.join(os.environ.get("GMXBIN"),self.trjconv)," is not there ")
-        	sys.exit(2)
+            print("  File ",os.path.join(os.environ.get("GMXBIN"),self.trjconv)," is not there ")
+            print("will try to ignore this")
+            #sys.exit(2)
         # the programpath
         if os.path.isfile(os.path.join(os.environ.get("GMXBIN"),self.programpath))==False:
-        	print("  File ",os.path.join(os.environ.get("GMXBIN"),self.programpath)," is not there ")
-        	sys.exit(2)
-        self.programpath=os.path.join(os.environ.get("GMXBIN"),self.programpath)
-        self.trjconv=os.path.join(os.environ.get("GMXBIN"),self.trjconv)
-        self.preprocessor=os.path.join(os.environ.get("GMXBIN"),self.preprocessor)
+            print("  File ",os.path.join(os.environ.get("GMXBIN"),self.programpath)," is not there ")
+            print("will try to ignore this")
+            #sys.exit(2)
+        #self.programpath=os.path.join(os.environ.get("GMXBIN"),self.programpath)
+        #self.trjconv=os.path.join(os.environ.get("GMXBIN"),self.trjconv)
+        #self.preprocessor=os.path.join(os.environ.get("GMXBIN"),self.preprocessor)
 
 
     def printMDInput(self,round,rootdir):
@@ -917,13 +920,53 @@ class MDParserClass(object):
                     sys.exit(2)
                 shutil.copy2(myfile,os.path.join(os.getcwd(),"coor_1.gro"))
                 # now make the grompp
+                #TODO add options in input file for grompp (e.g. -maxwarn, or for other gmx
+                #execution tool)
                 # you need the grompp, the top, the gro
-                mycommand=self.preprocessor+" -f md.mdp  -c coor_1.gro -p "+self.topology
+                #following line has been added in case one needs an index file
+                if os.path.isfile(f"{rootdir}/index.ndx")==True:
+                    mycommand=f"{self.preprocessor} -f md.mdp -n {rootdir}/index.ndx -c coor_1.gro -p {self.topology} -maxwarn 1"
+                else:
+                    mycommand=self.preprocessor+" -f md.mdp -maxwarn 1 -c coor_1.gro -p "+self.topology
+                print(mycommand)
+                proc=subprocess.Popen(mycommand,shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
+                f=open("grompp.stdout","w")
+                #in python3 proc.stdout.readlines() is a byte array
+                for l in proc.stdout.readlines():
+                    if isinstance(l, bytes):
+                        l = l.decode()
+                    f.write(l)
+                f.close()
+                f=open("grompp.stderr","w")
+                for l in proc.stderr.readlines():
+                    if isinstance(l, bytes):
+                        l = l.decode()
+                    f.write(l)
+                f.close()
+            else:
+            	print("PROGRAM NOT KNOWN")
+            	sys.exit()
+
+    	else:
+            # the file should be already in place (as restart or from the previous run which will be newly carried out)
+            if(self.program=="GROMACS"):
+                file="coor_"+str(round)+".gro"
+                if os.path.isfile(file)==False:
+                	print("Startfile not in place")
+                	sys.exit()
+                # bring evthing into the box?
+                #following line has been added in case one needs an index file
+                if os.path.isfile(f"{rootdir}/index.ndx")==True:
+                    mycommand=f"{self.preprocessor} -f md.mdp -n {rootdir}/index.ndx -c coor_{str(round)}.gro -p {self.topology} -naxwarn 1"
+                else:
+                    mycommand=self.preprocessor+" -f md.mdp -maxwarn 1 -c coor_"+str(round)+".gro -p "+self.topology
                 print(mycommand)
                 proc=subprocess.Popen(mycommand,shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
                 f=open("grompp.stdout","w")
                 for l in proc.stdout.readlines():
-                  f.write(l)
+                    if isinstance(l, bytes):
+                        l = l.decode()
+                    f.write(l)
                 f.close()
                 f=open("grompp.stderr","w")
                 for l in proc.stderr.readlines():
@@ -932,29 +975,6 @@ class MDParserClass(object):
             else:
             	print("PROGRAM NOT KNOWN")
             	sys.exit()
-
-    	else:
-    		# the file should be already in place (as restart or from the previous run which will be newly carried out)
-    		if(self.program=="GROMACS"):
-    			file="coor_"+str(round)+".gro"
-    			if os.path.isfile(file)==False:
-    				print("Startfile not in place")
-    				sys.exit()
-                # bring evthing into the box?
-    			mycommand=self.preprocessor+" -f md.mdp  -c coor_"+str(round)+".gro -p "+self.topology
-    			print(mycommand)
-    			proc=subprocess.Popen(mycommand,shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
-    			f=open("grompp.stdout","w")
-    			for l in proc.stdout.readlines():
-    			    f.write(l)
-    			f.close()
-    			f=open("grompp.stderr","w")
-    			for l in proc.stderr.readlines():
-    			  f.write(l)
-    			f.close()
-    		else:
-    			print("PROGRAM NOT KNOWN")
-    			sys.exit()
     def programLauncher(self,rootdir,workdir,index,myQueue):
     	"""takes care of launching the md program"""
     	this_dir=os.getcwd()
@@ -973,10 +993,14 @@ class MDParserClass(object):
             proc=subprocess.Popen(command,shell=True,stderr=subprocess.PIPE,stdout=subprocess.PIPE)
             f=open("run.stdout","w")
             for l in proc.stdout.readlines():
+                if isinstance(l, bytes):
+                    l = l.decode()
                 f.write(l)
             f.close()
             f=open("run.stderr","w")
             for l in proc.stderr.readlines():
+                if isinstance(l, bytes):
+                    l = l.decode()
                 f.write(l)
             f.close()
     	elif myQueue.queue == "internal" :

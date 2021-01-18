@@ -1,0 +1,28 @@
+
+#
+# this imposes just the bias
+#
+PATHMSD ...
+  LABEL=path
+  REFERENCE=/home/users/jeremy/gitrepo/pathoptimizer/test2/mywork/dir_1/iter_1.dat
+  LAMBDA=20
+... PATHMSD
+wall: MOVINGRESTRAINT ARG=path.sss,path.zzz STEP0=0 AT0=1.0,0. KAPPA0=1000.0,2000.0
+#
+# this below is for a statistics on the bias
+#
+PATHMSD ...
+  LABEL=path_stat
+  REFERENCE=/home/users/jeremy/gitrepo/pathoptimizer/test2/mywork/dir_1/iter_1.dat
+  LAMBDA=20
+  NUMERICAL_DERIVATIVES
+... PATHMSD
+meanforce_s:  MATHEVAL ARG=path_stat.sss VAR=s  PERIODIC=NO FUNC=1000.0*(1.0-s)
+meanforce_z:  MATHEVAL ARG=path_stat.zzz VAR=z  PERIODIC=NO FUNC=2000.0*z
+avg_meanforces: AVERAGE ARG=path_stat.sss STRIDE=50 USE_ALL_DATA
+avg_meanforces: AVERAGE ARG=path_stat.zzz STRIDE=50 USE_ALL_DATA
+avg_meanforces: AVERAGE ARG=meanforce_s STRIDE=50 USE_ALL_DATA
+avg_meanforces: AVERAGE ARG=meanforce_z STRIDE=50 USE_ALL_DATA
+avg_derivatives: AVERAGE ARG=(path_stat\.sss_refder_.+|path_stat\.zzz_refder_.+) STRIDE=50 USE_ALL_DATA
+PRINT ARG=(avg_derivatives\..+) STRIDE=500 FILE=average_derivatives FMT=%12.8e
+PRINT ARG=(avg_meanforces\..+) STRIDE=500 FILE=average_meanforces FMT=%12.8e

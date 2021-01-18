@@ -2,8 +2,8 @@
 # specifications for the PCV path
 #############################
 discard=0.1
-test=True
-string="path.pdb"
+test=False
+string="path_test.pdb"
 maxrounds=30
 storedir="store"
 workdir="mywork"
@@ -12,7 +12,7 @@ dumpfreq=500
 evolstep=0.00125
 optends=True
 pathtype="PCV"
-lambdaval=
+lambdaval=20
 springconstant_s=1000.
 springconstant_z=2000.
 # plumedoptions are placed before all
@@ -27,11 +27,12 @@ springconstant_z=2000.
 #############################
 program="GROMACS"
 template="md.mdp"
-topology="topol.top"
-steps=5000
-plumed_append_library_path="/Users/davidebranduardi/Programs/plumed2/src/lib/"
-programpath="mdrun_mpi_d"
-preprocessor="grompp_mpi_d"
-trjconv="trjconv_mpi_d"
-gmxdir="/Users/davidebranduardi/Programs/plumed2/codes/gromacs/gromacs-4.6.5_shared_llvm/build_llvm/install"
-preprogram="export DYLD_LIBRARY_PATH=\"/Users/davidebranduardi/Programs/plumed2/src/lib/:$DYLD_LIBRARY_PATH\" ; "
+topology="polcc_ZN_heavyH.top"
+steps=100
+plumed_append_library_path="/data/shared/opt/plumed_2.6.1/lib/"
+programpath="nice -n 19 gmx mdrun -ntmpi 1 -nt 12 -gpu_id 1"
+preprocessor="gmx grompp"
+trjconv="gmx trjconv"
+gmxdir="/data/shared/opt/gromacs/2020.2_plumed"
+#preprogram="export PATH='/data/shared/opt/plumed/plumed_2.6.1/bin/:$PATH' && export LD_LIBRARY_PATH='/data/shared/opt/plumed/plumed_2.6.1/lib/':$LD_LIBRARY_PATH && export INCLUDE='/data/shared/opt/plumed/plumed_2.6.1/include/':$INCLUDE && export PKG_CONFIG_PATH='/data/shared/opt/plumed/plumed_2.6.1/lib/pkgconfig:$PKG_CONFIG_PATH' && source /data/shared/opt/gromacs/2020.2_plumed/bin/GMXRC; "
+preprogram=""

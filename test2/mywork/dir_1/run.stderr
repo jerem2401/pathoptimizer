@@ -1,0 +1,68 @@
+                  :-) GROMACS - gmx mdrun, 2020.2-MODIFIED (-:
+
+                            GROMACS is written by:
+     Emile Apol      Rossen Apostolov      Paul Bauer     Herman J.C. Berendsen
+    Par Bjelkmar      Christian Blau   Viacheslav Bolnykh     Kevin Boyd    
+ Aldert van Buuren   Rudi van Drunen     Anton Feenstra       Alan Gray     
+  Gerrit Groenhof     Anca Hamuraru    Vincent Hindriksen  M. Eric Irrgang  
+  Aleksei Iupinov   Christoph Junghans     Joe Jordan     Dimitrios Karkoulis
+    Peter Kasson        Jiri Kraus      Carsten Kutzner      Per Larsson    
+  Justin A. Lemkul    Viveca Lindahl    Magnus Lundborg     Erik Marklund   
+    Pascal Merz     Pieter Meulenhoff    Teemu Murtola       Szilard Pall   
+    Sander Pronk      Roland Schulz      Michael Shirts    Alexey Shvetsov  
+   Alfons Sijbers     Peter Tieleman      Jon Vincent      Teemu Virolainen 
+ Christian Wennberg    Maarten Wolf      Artem Zhmurov   
+                           and the project leaders:
+        Mark Abraham, Berk Hess, Erik Lindahl, and David van der Spoel
+
+Copyright (c) 1991-2000, University of Groningen, The Netherlands.
+Copyright (c) 2001-2019, The GROMACS development team at
+Uppsala University, Stockholm University and
+the Royal Institute of Technology, Sweden.
+check out http://www.gromacs.org for more information.
+
+GROMACS is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License
+as published by the Free Software Foundation; either version 2.1
+of the License, or (at your option) any later version.
+
+GROMACS:      gmx mdrun, version 2020.2-MODIFIED
+Executable:   /data/shared/opt/gromacs/2020.2_plumed/bin/gmx
+Data prefix:  /data/shared/opt/gromacs/2020.2_plumed
+Working dir:  /home/users/jeremy/gitrepo/pathoptimizer/test2/mywork/dir_1
+Command line:
+  gmx mdrun -ntmpi 1 -nt 12 -gpu_id 1 -s topol.tpr -x outcoord_1.xtc -c outcoord_1.gro -plumed plumed.dat
+
+Reading file topol.tpr, VERSION 2020.2-MODIFIED (single precision)
+Changing nstlist from 10 to 50, rlist from 1.02 to 1.152
+
+1 GPU selected for this run.
+Mapping of GPU IDs to the 2 GPU tasks in the 1 rank on this node:
+  PP:1,PME:1
+PP tasks will do (non-perturbed) short-ranged interactions on the GPU
+PP task will update and constrain coordinates on the CPU
+PME tasks will do all aspects on the GPU
+Using 1 MPI thread
+
+Non-default thread affinity set, disabling internal thread affinity
+
+Using 12 OpenMP threads 
+
+starting mdrun 'Protein in water'
+100 steps,      0.4 ps.
+
+-------------------------------------------------------
+Program:     gmx mdrun, version 2020.2-MODIFIED
+
+Unknown exception:
+(exception type: N4PLMD14ExceptionErrorE)
+
++++ PLUMED error
++++ at Action.cpp:242, function void PLMD::Action::error(const string&) const
++++ message follows +++
+ERROR in input to action AVERAGE with label avg_meanforces : cannot understand
+the following words from the input line : USE_ALL_DATA
+
+For more information and tips for troubleshooting, please check the GROMACS
+website at http://www.gromacs.org/Documentation/Errors
+-------------------------------------------------------

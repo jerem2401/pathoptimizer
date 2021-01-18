@@ -1,0 +1,8 @@
+/bin/sh: line 0: export: `-s': not a valid identifier
+/bin/sh: line 0: export: `topol.tpr': not a valid identifier
+/bin/sh: line 0: export: `-x': not a valid identifier
+/bin/sh: line 0: export: `outcoord_1.xtc': not a valid identifier
+/bin/sh: line 0: export: `-c': not a valid identifier
+/bin/sh: line 0: export: `outcoord_1.gro': not a valid identifier
+/bin/sh: line 0: export: `-plumed': not a valid identifier
+/bin/sh: line 0: export: `plumed.dat': not a valid identifier

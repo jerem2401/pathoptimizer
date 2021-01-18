@@ -1,0 +1,1 @@
+ -s topol.tpr  -x outcoord_1.xtc -c outcoord_1.gro -plumed plumed.dat 
